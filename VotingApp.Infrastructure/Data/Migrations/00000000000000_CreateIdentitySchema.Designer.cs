@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using VotingApp.Infrastructure.DbContext;
 using VotingApp.UI.Data;
 
 namespace VotingApp.UI.Data.Migrations

@@ -27,7 +27,7 @@ namespace VotingApp.Core.Domain.RepositoryContracts
         /// </summary>
         /// <param name="commentId"></param>
         /// <returns></returns>
-        Task<Comment> GetCommentById(Guid commentId);
+        Task<Comment?> GetCommentById(Guid commentId);
 
         /// <summary>
         /// Retrieves all comments for a specific poll.

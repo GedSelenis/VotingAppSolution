@@ -35,7 +35,7 @@ namespace VotingApp.Core.Services
             }
             if (commentAddRequest.CreatedBy == Guid.Empty)
             {
-                throw new ArgumentException("User ID must be specified for the comment.", nameof(commentAddRequest.UserId));
+                throw new ArgumentException("Created by must be specified for the comment.", nameof(commentAddRequest.CreatedBy));
             }
             Comment comment = commentAddRequest.ToComment();
             comment.Id = Guid.NewGuid();

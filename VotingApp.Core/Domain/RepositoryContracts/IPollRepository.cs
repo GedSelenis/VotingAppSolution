@@ -13,7 +13,7 @@ namespace VotingApp.Core.Domain.RepositoryContracts
         Task<int> AddPoll(Poll request);
         Task<bool> AddVote(Guid pollId, string userName);
         Task<List<Poll>> GetAllPolls();
-        Task<Poll> GetPollById(Guid pollId);
+        Task<Poll?> GetPollById(Guid pollId);
         Task<bool> DeletePoll(Guid pollId);
     }
 }

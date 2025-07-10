@@ -12,7 +12,7 @@ namespace VotingApp.Core.DTO
         public Guid Id { get; set; }
         public string Content { get; set; }
         public DateTime CreatedAt { get; set; }
-        public string CreatedBy { get; set; }
+        public Guid CreatedBy { get; set; }
     }
 
     public static class CommentExtensions

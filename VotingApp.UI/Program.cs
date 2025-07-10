@@ -1,6 +1,10 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using VotingApp.UI.Data;
+using VotingApp.Core.Domain.RepositoryContracts;
+using VotingApp.Core.ServiceContracts;
+using VotingApp.Core.Services;
+using VotingApp.Infrastructure.DbContext;
+using VotingApp.Infrastructure.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,6 +17,14 @@ builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
     .AddEntityFrameworkStores<ApplicationDbContext>();
 builder.Services.AddRazorPages();
+builder.Services.AddControllersWithViews();
+builder.Services.AddScoped<IPollService, PollService>();
+builder.Services.AddScoped<ICommentService, CommentService>();
+builder.Services.AddScoped<IPollRepository, PollsRepository>();
+builder.Services.AddScoped<ICommentRepository, CommentRepository>();
+builder.Services.AddScoped<IPollOptionsRepository, PollOptionsRepository>();
+
+
 
 var app = builder.Build();
 
@@ -25,6 +37,7 @@ else
 {
     app.UseExceptionHandler("/Error");
 }
+app.MapControllers();
 app.UseStaticFiles();
 
 app.UseRouting();
