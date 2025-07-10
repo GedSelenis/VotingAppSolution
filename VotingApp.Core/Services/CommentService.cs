@@ -1,0 +1,76 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using VotingApp.Core.Domain.Entities;
+using VotingApp.Core.Domain.RepositoryContracts;
+using VotingApp.Core.DTO;
+using VotingApp.Core.ServiceContracts;
+
+namespace VotingApp.Core.Services
+{
+    public class CommentService : ICommentService
+    {
+        private readonly ICommentRepository _commentRepository;
+
+        public CommentService(ICommentRepository commentRepository)
+        {
+            _commentRepository = commentRepository;
+        }
+
+        public async Task<CommentResponse> AddComment(CommentAddRequest commentAddRequest)
+        {
+            if (commentAddRequest == null)
+            {
+                throw new ArgumentNullException(nameof(commentAddRequest), "Comment request cannot be null.");
+            }
+            if (string.IsNullOrWhiteSpace(commentAddRequest.Content))
+            {
+                throw new ArgumentException("Comment content cannot be empty.", nameof(commentAddRequest.Content));
+            }
+            if (commentAddRequest.PollId == Guid.Empty)
+            {
+                throw new ArgumentException("Poll ID must be specified for the comment.", nameof(commentAddRequest.PollId));
+            }
+            if (commentAddRequest.CreatedBy == Guid.Empty)
+            {
+                throw new ArgumentException("User ID must be specified for the comment.", nameof(commentAddRequest.UserId));
+            }
+            Comment comment = commentAddRequest.ToComment();
+            comment.Id = Guid.NewGuid();
+            comment.CreatedAt = DateTime.UtcNow;
+
+            await _commentRepository.AddComment(comment);
+
+            return comment.ToResponse();
+        }
+
+        public async Task<bool> DeleteComment(Guid commentId, Guid userID)
+        {
+            if (commentId == Guid.Empty)
+            {
+                throw new ArgumentException("Comment ID must be specified.", nameof(commentId));
+            }
+            if (userID == Guid.Empty)
+            {
+                throw new ArgumentException("User ID must be specified.", nameof(userID));
+            }
+            Comment comment = await _commentRepository.GetCommentById(commentId);
+            if (comment == null)
+            {
+                throw new KeyNotFoundException($"Comment with ID {commentId} not found.");
+            }
+            if (comment.CreatedBy != userID)
+            {
+                throw new UnauthorizedAccessException("User is not authorized to delete this comment.");
+            }
+            return await _commentRepository.DeleteComment(commentId);
+        }
+
+        public async Task<List<CommentResponse>> GetComments(Guid pollId)
+        {
+            return (await _commentRepository.GetCommentsByPollId(pollId)).Select(c => c.ToResponse()).ToList();
+        }
+    }
+}
