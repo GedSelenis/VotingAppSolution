@@ -1,0 +1,106 @@
+﻿@model PollResponse
+@{
+	ViewBag.Title = "Create Person";
+}
+
+<div class="flex">
+	<div class="flex-1">
+		<div class="text-grey">
+			<span>Contacts</span>
+			<i class="fa-solid fa-caret-right"></i>
+			<span>Persons</span>
+			<i class="fa-solid fa-caret-right"></i>
+			<span>Create</span>
+		</div>
+	</div>
+</div>
+
+<div class="form-container">
+	<a asp-controller="Home" asp-action="Index" class="link-hover">Back to Poll List</a>
+	<h2 class="text-large">Create person</h2>
+	<form asp-controller="Home" asp-action="AddPoll" method="post">
+
+		@*Title*@
+		<div class="form-field flex">
+			<div class="w-25">
+				<label for="Title" class="form-label pt">Title</label>
+			</div>
+			<div class="flex-1">
+				<div class="flex-1">
+					<input asp-for="Title" class="form-input" placeholder="Title" readonly="readonly"/>
+					<span asp-validation-for="Title" class="text-red"></span>
+				</div>
+			</div>
+		</div>
+
+		@*EndTime*@
+		<div class="form-field flex">
+			<div class="w-25">
+				<label for="PollEndTime" class="form-label pt">Poll End Time</label>
+			</div>
+			<div class="flex-1">
+				<div class="flex-1">
+					<input asp-for="PollEndTime" class="form-input" readonly="readonly" />
+					<span asp-validation-for="PollEndTime" class="text-red"></span>
+				</div>
+			</div>
+		</div>
+
+		@*Options*@
+		<div class="form-field flex">
+			<div class="w-25">
+				<label class="form-label pt">Gender</label>
+			</div>
+			<div class="flex-1">
+				<div class="flex-1">
+					@foreach (PollOption option in Model.Options)
+					{
+						<input type="radio" asp-for="Options" value="@option" class="ml" />
+						<label for="@option">@option.OptionText</label>
+					}
+					<span asp-validation-for="Options" class="text-red"></span>
+				</div>
+			</div>
+		</div>
+
+		@*AuthenticatedOnly*@
+		<div class="form-field flex">
+			<div class="w-25">
+			</div>
+			<div class="flex-1">
+				<div class="flex-1">
+					<input asp-for="AuthenticatedOnly" value="true" readonly="readonly"/>
+					<label for="AuthenticatedOnly" class="form-label">Authenticated Only</label>
+					<span asp-validation-for="AuthenticatedOnly" class="text-red"></span>
+				</div>
+			</div>
+		</div>
+
+		@*Submit*@
+		<div class="form-field flex">
+			<div class="w-25">
+			</div>
+			<div class="flex-1">
+				<div class="flex-1">
+					<button class="button button-green-back">Vote</button>
+					<div asp-validation-summary="All" class="text-red"></div>
+					@if (ViewBag.Errors != null)
+					{
+						<div class="text-red ml">
+							<ul>
+								@foreach (var error in ViewBag.Errors)
+								{
+									<li class="ml">@error</li>
+								}
+							</ul>
+						</div>
+					}
+				</div>
+			</div>
+		</div>
+	</form>
+	@*Comments*@
+	<div style="background-color:aquamarine">
+		
+	</div>
+</div>

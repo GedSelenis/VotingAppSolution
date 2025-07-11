@@ -13,7 +13,7 @@ namespace VotingApp.Core.Domain.Entities
         [Key]
         public Guid Id { get; set; }
         public string OptionText { get; set; }
-        public List<string> Voters { get; set; }
+        public List<string>? Voters { get; set; }
         public Guid PollId { get; set; }
         [ForeignKey("PollId")]
         public Poll? Poll { get; set; }

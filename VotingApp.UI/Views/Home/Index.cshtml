@@ -1,6 +1,9 @@
 ﻿@model List<PollResponse>
 <h1>Polls</h1>
 
+
+<a asp-controller="Home" asp-action="AddPoll">Add poll</a>
+
 <table class="table w-100 mt persons">
 	<thead>
 		<tr>
@@ -14,12 +17,12 @@
 		@foreach (PollResponse pollResponse in Model)
 		{
 			<tr>
-				<td style="width:10%">@pollResponse.Title</td>
+				<td style="width:20%">@pollResponse.Title</td>
 				<td style="width:10%">@pollResponse.CreatedBy</td>
-				<td style="width:20%">@pollResponse.IsActive</td>
-				<td style="width:20%">
-					<a asp-controller="Home" asp-action="Details" asp-route-pollId="@pollResponse.Id">Details</a>
-					<a asp-controller="Home" asp-action="Vote" asp-route-personID="@pollResponse.Id">Vote</a>
+				<td style="width:10%">@pollResponse.IsActive</td>
+				<td style="width:10%">
+					<a asp-controller="Home" asp-action="PollDetails" asp-route-pollId="@pollResponse.Id">Details</a>
+					@* <a asp-controller="Home" asp-action="Vote" asp-route-personID="@pollResponse.Id">Vote</a> *@
 				</td>
 			</tr>
 		}

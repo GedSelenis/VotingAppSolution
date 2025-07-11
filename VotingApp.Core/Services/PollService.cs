@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Identity;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -15,12 +16,13 @@ namespace VotingApp.Core.Services
         private readonly IPollRepository _pollRepository;
         private readonly IPollOptionsRepository _optionsRepository;
 
+
         public PollService(IPollRepository pollRepository, IPollOptionsRepository pollOptionsRepository)
         {
             _pollRepository = pollRepository;
             _optionsRepository = pollOptionsRepository;
         }
-        public async Task<PollResponse> AddPollAsync(PollAddRequest request)
+        public async Task<PollResponse> AddPoll(PollAddRequest request)
         {
             if (request == null)
             {

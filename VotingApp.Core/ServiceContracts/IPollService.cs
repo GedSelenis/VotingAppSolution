@@ -14,7 +14,7 @@ namespace VotingApp.Core.ServiceContracts
         /// </summary>
         /// <param name="request">Request data</param>
         /// <returns>Copy of an added poll</returns>
-        public Task<PollResponse> AddPollAsync(PollAddRequest request);
+        public Task<PollResponse> AddPoll(PollAddRequest request);
 
         /// <summary>
         /// Retrieves a poll by its ID asynchronously.

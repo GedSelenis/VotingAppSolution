@@ -13,7 +13,7 @@ namespace VotingApp.Core.DTO
         public DateTime PollEndTime { get; set; }
         public string CreatedBy { get; set; }
         public List<PollOption> Options { get; set; }
-        public List<Comment> Comments { get; set; }
+        public string optionsText { get; set; }
         public bool IsActive => PollEndTime > DateTime.UtcNow;
         public bool AuthenticatedOnly { get; set; }
 
@@ -25,7 +25,6 @@ namespace VotingApp.Core.DTO
                 PollEndTime = PollEndTime,
                 CreatedBy = CreatedBy,
                 Options = Options,
-                Comments = Comments,
                 AuthenticatedOnly = AuthenticatedOnly
             };
         }
