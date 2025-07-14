@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Identity;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -14,12 +15,15 @@ namespace VotingApp.Core.Services
     {
         private readonly ICommentRepository _commentRepository;
 
-        public CommentService(ICommentRepository commentRepository)
+        private readonly UserManager<IdentityUser> _userManager;
+
+        public CommentService(ICommentRepository commentRepository, UserManager<IdentityUser> userManager)
         {
             _commentRepository = commentRepository;
+            _userManager = userManager;
         }
 
-        public async Task<CommentResponse> AddComment(CommentAddRequest commentAddRequest)
+        public async Task<CommentResponse> AddComment(CommentAddRequest commentAddRequest, string userName)
         {
             if (commentAddRequest == null)
             {
@@ -38,6 +42,7 @@ namespace VotingApp.Core.Services
                 throw new ArgumentException("Created by must be specified for the comment.", nameof(commentAddRequest.CreatedBy));
             }
             Comment comment = commentAddRequest.ToComment();
+            comment.CreatedByName = userName;
             comment.Id = Guid.NewGuid();
             comment.CreatedAt = DateTime.UtcNow;
 

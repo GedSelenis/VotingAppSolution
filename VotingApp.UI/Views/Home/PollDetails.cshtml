@@ -1,24 +1,12 @@
 ﻿@model PollResponse
 @{
-	ViewBag.Title = "Create Person";
+	ViewBag.Title = "Poll Details";
 }
-
-<div class="flex">
-	<div class="flex-1">
-		<div class="text-grey">
-			<span>Contacts</span>
-			<i class="fa-solid fa-caret-right"></i>
-			<span>Persons</span>
-			<i class="fa-solid fa-caret-right"></i>
-			<span>Create</span>
-		</div>
-	</div>
-</div>
 
 <div class="form-container">
 	<a asp-controller="Home" asp-action="Index" class="link-hover">Back to Poll List</a>
 	<h2 class="text-large">Create person</h2>
-	<form asp-controller="Home" asp-action="AddPoll" method="post">
+	<form asp-controller="Home" asp-action="VotePoll" method="post">
 
 		@*Title*@
 		<div class="form-field flex">
@@ -49,14 +37,24 @@
 		@*Options*@
 		<div class="form-field flex">
 			<div class="w-25">
-				<label class="form-label pt">Gender</label>
+				<label class="form-label pt">Options</label>
 			</div>
 			<div class="flex-1">
 				<div class="flex-1">
 					@foreach (PollOption option in Model.Options)
 					{
-						<input type="radio" asp-for="Options" value="@option" class="ml" />
+						<div>
 						<label for="@option">@option.OptionText</label>
+							@if (option.Voters == null)
+							{
+								
+								<label for="@option">0</label>
+							}
+							else
+							{
+							<label for="@option">@option.Voters?.Count()</label>
+							}
+						</div>
 					}
 					<span asp-validation-for="Options" class="text-red"></span>
 				</div>
@@ -75,32 +73,15 @@
 				</div>
 			</div>
 		</div>
-
-		@*Submit*@
-		<div class="form-field flex">
-			<div class="w-25">
-			</div>
-			<div class="flex-1">
-				<div class="flex-1">
-					<button class="button button-green-back">Vote</button>
-					<div asp-validation-summary="All" class="text-red"></div>
-					@if (ViewBag.Errors != null)
-					{
-						<div class="text-red ml">
-							<ul>
-								@foreach (var error in ViewBag.Errors)
-								{
-									<li class="ml">@error</li>
-								}
-							</ul>
-						</div>
-					}
-				</div>
-			</div>
-		</div>
 	</form>
 	@*Comments*@
-	<div style="background-color:aquamarine">
-		
+	<div style="background-color:aquamarine" class="w-50">
+		<a asp-controller="Home" asp-action="AddComment" asp-route-pollId="@Model.Id">AddComment</a>
+		@foreach (var comment in Model.Comments)
+		{
+			<div class="comment" style="background-color:azure">
+				<p><strong>@comment.CreatedByName</strong> (@comment.CreatedAt): @comment.Content</p>
+			</div>
+        }
 	</div>
 </div>

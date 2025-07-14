@@ -20,7 +20,7 @@ namespace VotingApp.Core.ServiceContracts
         /// </summary>
         /// <param name="commentAddRequest"></param>
         /// <returns></returns>
-        public Task<CommentResponse> AddComment(CommentAddRequest commentAddRequest);
+        public Task<CommentResponse> AddComment(CommentAddRequest commentAddRequest, string userName);
 
         /// <summary>
         /// Deletes a comment by its ID if the user is authorized to do so.

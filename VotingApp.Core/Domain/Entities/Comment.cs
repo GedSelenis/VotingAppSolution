@@ -15,6 +15,7 @@ namespace VotingApp.Core.Domain.Entities
         public string Content { get; set; }
         public DateTime CreatedAt { get; set; }
         public Guid CreatedBy { get; set; }
+        public string? CreatedByName { get; set; }
         public Guid PollId { get; set; }
         [ForeignKey("PollId")]
         public Poll? Poll { get; set; }
