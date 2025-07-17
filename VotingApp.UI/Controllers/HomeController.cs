@@ -13,12 +13,14 @@ namespace VotingApp.UI.Controllers
         private readonly IPollService _pollService;
         private readonly ICommentService _commentService;
         private readonly UserManager<IdentityUser> _userManager;
+        private readonly IEmailSender _emailSender;
 
-        public HomeController(IPollService pollService, UserManager<IdentityUser> userManager, ICommentService commentService)
+        public HomeController(IPollService pollService, UserManager<IdentityUser> userManager, ICommentService commentService, IEmailSender emailSender)
         {
             _pollService = pollService;
             _userManager = userManager;
             _commentService = commentService;
+            _emailSender = emailSender;
         }
 
         [Route("/")]
@@ -58,7 +60,7 @@ namespace VotingApp.UI.Controllers
             {
                 return BadRequest("Poll data cannot be null.");
             }
-            if (pollAddRequest.optionsText == null || !pollAddRequest.optionsText.Any())
+            if (string.IsNullOrWhiteSpace(pollAddRequest.optionsText))
             {
                 ModelState.AddModelError("optionsText", "At least one option is required.");
             }
@@ -132,9 +134,117 @@ namespace VotingApp.UI.Controllers
 
             pollAddVoteRequest.UserName = _userManager.GetUserName(HttpContext.User) ?? string.Empty;
 
+            if (string.IsNullOrWhiteSpace(pollAddVoteRequest.UserName))
+            {
+                RedirectToAction("AddVoteAnonymous", new { pollID = pollId });
+            }
+
             PollResponse updatedPoll = await _pollService.AddVote(pollAddVoteRequest);
 
             return RedirectToAction("PollDetails", new { pollId = updatedPoll.Id });
+        }
+
+        [Route("AddVote/{pollId}/{optionID}")]
+        [HttpGet]
+        public async Task<IActionResult> AddVote(Guid pollId, Guid optionID)
+        {
+            if (pollId == Guid.Empty || optionID == Guid.Empty)
+            {
+                return BadRequest("Poll ID and vote data cannot be empty.");
+            }
+            PollAddVoteRequest pollAddVoteRequest = new PollAddVoteRequest
+            {
+                OptionId = optionID,
+                PollId = pollId,
+                UserName = _userManager.GetUserName(HttpContext.User) ?? string.Empty
+            };
+
+            if (string.IsNullOrWhiteSpace(pollAddVoteRequest.UserName))
+            {
+                return RedirectToAction("AddVoteAnonymous", new { pollID = pollId });
+            }
+
+            PollResponse updatedPoll = await _pollService.AddVote(pollAddVoteRequest);
+
+            return RedirectToAction("PollDetails", new { pollId = updatedPoll.Id });
+        }
+
+        [Route("AddVote/AnonymousVote/{pollID}")]
+        [HttpGet]
+        public async Task<IActionResult> AddVoteAnonymous(Guid pollID)
+        {
+            if (pollID == Guid.Empty)
+            {
+                return BadRequest("Poll ID cannot be empty.");
+            }
+            PollResponse poll = await _pollService.GetPoll(pollID);
+            if (poll == null)
+            {
+                return NotFound($"Poll with ID {pollID} not found.");
+            }
+
+            PollAnonymousVoteRequest pollAnonymousVoteRequest = new PollAnonymousVoteRequest
+            {
+                PollId = pollID,
+                UserEmail = string.Empty
+            };
+
+            return View(pollAnonymousVoteRequest);
+        }
+
+        [Route("AddVote/AnonymousVote/{pollID}/{optionID}/{email}")]
+        [HttpGet]
+        public async Task<IActionResult> AddVoteAnonymous(Guid pollID, Guid optionID, string email)
+        {
+            if (pollID == Guid.Empty)
+            {
+                return BadRequest("Poll ID cannot be empty.");
+            }
+            PollResponse poll = await _pollService.GetPoll(pollID);
+            if (poll == null)
+            {
+                return NotFound($"Poll with ID {pollID} not found.");
+            }
+            if (optionID == Guid.Empty)
+            {
+                return BadRequest("Option ID cannot be empty.");
+            }
+            if (string.IsNullOrWhiteSpace(email))
+            {
+                return BadRequest("Email cannot be empty.");
+            }
+
+            PollAddVoteRequest pollAddVoteRequest = new PollAddVoteRequest
+            {
+                OptionId = optionID,
+                PollId = pollID,
+                UserName = email
+            };
+
+            PollResponse updatedPoll = await _pollService.AddVote(pollAddVoteRequest);
+
+            return RedirectToAction("PollDetails", new { pollId = updatedPoll.Id });
+        }
+
+        [Route("AddVote/AnonymousVote/{pollID}")]
+        [HttpPost]
+        public async Task<IActionResult> AddVoteAnonymous(PollAnonymousVoteRequest pollAnonymousVoteRequest)
+        {
+            if (pollAnonymousVoteRequest == null || string.IsNullOrWhiteSpace(pollAnonymousVoteRequest.UserEmail))
+            {
+                return BadRequest("Poll ID and email cannot be empty.");
+            }
+            PollResponse poll = await _pollService.GetPoll(pollAnonymousVoteRequest.PollId);
+            string body = "Here is vote options for you:\n\n\n";
+            foreach (var option in poll.Options)
+            {
+                body += $"{option.OptionText}\n";
+                body += "Vote link: " + Url.Action("AddVoteAnonymous", "Home", new { pollID = pollAnonymousVoteRequest.PollId, optionID = option.Id, email = pollAnonymousVoteRequest.UserEmail}, Request.Scheme) + "\n\n";
+            }
+
+            await _emailSender.SendEmailAsync(pollAnonymousVoteRequest.UserEmail, "Voting options", body);
+
+            return RedirectToAction("PollDetails", new { pollId = pollAnonymousVoteRequest.PollId });
         }
     }
 }

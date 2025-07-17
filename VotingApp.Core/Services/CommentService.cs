@@ -41,10 +41,15 @@ namespace VotingApp.Core.Services
             {
                 throw new ArgumentException("Created by must be specified for the comment.", nameof(commentAddRequest.CreatedBy));
             }
-            Comment comment = commentAddRequest.ToComment();
-            comment.CreatedByName = userName;
-            comment.Id = Guid.NewGuid();
-            comment.CreatedAt = DateTime.UtcNow;
+            Comment comment = new Comment
+            {
+                Content = commentAddRequest.Content,
+                CreatedBy = commentAddRequest.CreatedBy,
+                PollId = commentAddRequest.PollId,
+                CreatedByName = userName,
+                Id = Guid.NewGuid(),
+                CreatedAt = DateTime.UtcNow
+            };
 
             await _commentRepository.AddComment(comment);
 

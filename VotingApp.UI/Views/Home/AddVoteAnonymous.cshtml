@@ -1,0 +1,46 @@
+﻿@model PollAnonymousVoteRequest
+
+<div class="form-container">
+	<a asp-controller="Home" asp-action="Index" class="link-hover">Back to Poll List</a>
+	<h2 class="text-large">Vote anonymous</h2>
+	<form asp-controller="Home" asp-action="AddVoteAnonymous" method="post">
+
+		<input asp-for="PollId" type="hidden" />
+
+		@*Comment*@
+		<div class="form-field flex">
+			<div class="w-25">
+				<label for="UserEmail" class="form-label pt">Email</label>
+			</div>
+			<div class="flex-1">
+				<div class="flex-1">
+					<input asp-for="UserEmail" class="form-input" />
+					<span asp-validation-for="UserEmail" class="text-red"></span>
+				</div>
+			</div>
+		</div>
+
+		@*Submit*@
+		<div class="form-field flex">
+			<div class="w-25">
+			</div>
+			<div class="flex-1">
+				<div class="flex-1">
+					<button class="button button-green-back">Send voting links</button>
+					<div asp-validation-summary="All" class="text-red"></div>
+					@if (ViewBag.Errors != null)
+					{
+						<div class="text-red ml">
+							<ul>
+								@foreach (var error in ViewBag.Errors)
+								{
+									<li class="ml">@error</li>
+								}
+							</ul>
+						</div>
+					}
+				</div>
+			</div>
+		</div>
+	</form>
+</div>

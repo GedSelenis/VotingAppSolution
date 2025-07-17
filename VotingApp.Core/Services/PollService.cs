@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using VotingApp.Core.Domain.Entities;
 using VotingApp.Core.Domain.RepositoryContracts;
 using VotingApp.Core.DTO;
+using VotingApp.Core.Exceptions;
 using VotingApp.Core.ServiceContracts;
 
 namespace VotingApp.Core.Services
@@ -32,7 +33,7 @@ namespace VotingApp.Core.Services
             {
                 throw new ArgumentException("Poll title cannot be empty.", nameof(request.Title));
             }
-            if (request.Options == null || request.Options.Count() < 2)
+            if (request.Options == null || request.Options.Count < 2)
             {
                 throw new ArgumentException("Poll must have at least two options.", nameof(request.Options));
             }
@@ -60,10 +61,10 @@ namespace VotingApp.Core.Services
             {
                 throw new ArgumentNullException(nameof(pollAddVoteRequest), "Poll vote request cannot be null.");
             }
-            Poll poll = await _pollRepository.GetPollById(pollAddVoteRequest.PollId);
-            if (poll == null)
+            Poll? poll = await _pollRepository.GetPollById(pollAddVoteRequest.PollId);
+            if (poll is null)
             {
-                throw new KeyNotFoundException($"Poll with ID {pollAddVoteRequest.PollId} not found.");
+                throw new ObjectNotFoundException($"Poll with ID {pollAddVoteRequest.PollId} not found.");
             }
             if (pollAddVoteRequest.OptionId == Guid.Empty)
             {
@@ -85,8 +86,8 @@ namespace VotingApp.Core.Services
             {
                 // Vote is anonymous, no user validation needed
 
-                isValid = isValid && await _optionsRepository.AddVoter(pollAddVoteRequest.OptionId, pollAddVoteRequest.UserName ?? "");
-                isValid = isValid && await _pollRepository.AddVote(pollAddVoteRequest.PollId, pollAddVoteRequest.UserName ?? "");
+                //isValid = isValid && await _optionsRepository.AddVoter(pollAddVoteRequest.OptionId, pollAddVoteRequest.UserName ?? "");
+                isValid = await _pollRepository.AddVote(pollAddVoteRequest.PollId, pollAddVoteRequest.OptionId, pollAddVoteRequest.UserName ?? "");
             }
             else
             {
@@ -94,12 +95,12 @@ namespace VotingApp.Core.Services
                 {
                     throw new InvalidOperationException("User has already voted in this poll.");
                 }
-                isValid = isValid && await _optionsRepository.AddVoter(pollAddVoteRequest.OptionId, pollAddVoteRequest.UserName ?? "");
-                isValid = isValid && await _pollRepository.AddVote(pollAddVoteRequest.PollId, pollAddVoteRequest.UserName ?? "");
+                //isValid = isValid && await _optionsRepository.AddVoter(pollAddVoteRequest.OptionId, pollAddVoteRequest.UserName ?? "");
+                isValid = await _pollRepository.AddVote(pollAddVoteRequest.PollId, pollAddVoteRequest.OptionId, pollAddVoteRequest.UserName ?? "");
             }
             if (isValid) {
-                Poll updatedPoll = await _pollRepository.GetPollById(pollAddVoteRequest.PollId);
-                return updatedPoll.ToResponse();
+                Poll? updatedPoll = await _pollRepository.GetPollById(pollAddVoteRequest.PollId);
+                return updatedPoll?.ToResponse() ?? poll.ToResponse();
             }
             else
             {

@@ -54,6 +54,7 @@
 							{
 							<label for="@option">@option.Voters?.Count()</label>
 							}
+							<a asp-controller="Home" asp-action="AddVote" asp-route-pollId="@Model.Id" asp-route-optionId="@option.Id" class="link-hover">Vote</a>
 						</div>
 					}
 					<span asp-validation-for="Options" class="text-red"></span>

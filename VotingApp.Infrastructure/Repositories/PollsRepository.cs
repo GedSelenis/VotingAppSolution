@@ -13,10 +13,12 @@ namespace VotingApp.Infrastructure.Repositories
     public class PollsRepository : IPollRepository
     {
         private readonly ApplicationDbContext _db;
+        private readonly IPollOptionsRepository _optionsRepository;
 
-        public PollsRepository(ApplicationDbContext db)
+        public PollsRepository(ApplicationDbContext db, IPollOptionsRepository optionsRepository)
         {
             _db = db;
+            _optionsRepository = optionsRepository;
         }
 
         public async Task<int> AddPoll(Poll request)
@@ -25,10 +27,11 @@ namespace VotingApp.Infrastructure.Repositories
             return await _db.SaveChangesAsync();
         }
 
-        public async Task<bool> AddVote(Guid pollId, string userName)
+        public async Task<bool> AddVote(Guid pollId, Guid optionID, string userName)
         {
+            bool success = await _optionsRepository.AddVoter(optionID, userName);
             Poll? poll = await _db.Polls.FirstOrDefaultAsync(p => p.Id == pollId);
-            if (poll == null)
+            if (poll == null || !success)
             {
                 return false;
             }
