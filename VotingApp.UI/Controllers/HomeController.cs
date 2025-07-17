@@ -134,7 +134,9 @@ namespace VotingApp.UI.Controllers
 
             pollAddVoteRequest.UserName = _userManager.GetUserName(HttpContext.User) ?? string.Empty;
 
-            if (string.IsNullOrWhiteSpace(pollAddVoteRequest.UserName))
+            PollResponse poll = await _pollService.GetPoll(pollId);
+
+            if (string.IsNullOrWhiteSpace(pollAddVoteRequest.UserName) && !poll.AuthenticatedOnly)
             {
                 RedirectToAction("AddVoteAnonymous", new { pollID = pollId });
             }
@@ -156,7 +158,8 @@ namespace VotingApp.UI.Controllers
             {
                 OptionId = optionID,
                 PollId = pollId,
-                UserName = _userManager.GetUserName(HttpContext.User) ?? string.Empty
+                UserName = _userManager.GetUserName(HttpContext.User) ?? string.Empty,
+                UserId = _userManager.GetUserId(HttpContext.User) != null ? Guid.Parse(_userManager.GetUserId(HttpContext.User)) : (Guid?)null
             };
 
             if (string.IsNullOrWhiteSpace(pollAddVoteRequest.UserName))
@@ -218,7 +221,8 @@ namespace VotingApp.UI.Controllers
             {
                 OptionId = optionID,
                 PollId = pollID,
-                UserName = email
+                UserName = email,
+                UserId = Guid.Empty
             };
 
             PollResponse updatedPoll = await _pollService.AddVote(pollAddVoteRequest);

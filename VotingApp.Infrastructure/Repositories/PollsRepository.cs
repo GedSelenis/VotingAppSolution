@@ -27,22 +27,22 @@ namespace VotingApp.Infrastructure.Repositories
             return await _db.SaveChangesAsync();
         }
 
-        public async Task<bool> AddVote(Guid pollId, Guid optionID, string userName)
-        {
-            bool success = await _optionsRepository.AddVoter(optionID, userName);
-            Poll? poll = await _db.Polls.FirstOrDefaultAsync(p => p.Id == pollId);
-            if (poll == null || !success)
-            {
-                return false;
-            }
-            if (poll.Voters == null)
-            {
-                poll.Voters = new List<string>();
-            }
-            poll.Voters.Add(userName);
-            await _db.SaveChangesAsync();
-            return true;
-        }
+        //public async Task<bool> AddVote(Guid pollId, Guid optionID, string userName)
+        //{
+        //    bool success = await _optionsRepository.AddVoter(optionID, userName);
+        //    Poll? poll = await _db.Polls.FirstOrDefaultAsync(p => p.Id == pollId);
+        //    if (poll == null || !success)
+        //    {
+        //        return false;
+        //    }
+        //    if (poll.Voters == null)
+        //    {
+        //        poll.Voters = new List<string>();
+        //    }
+        //    poll.Voters.Add(userName);
+        //    await _db.SaveChangesAsync();
+        //    return true;
+        //}
 
         public async Task<bool> DeletePoll(Guid pollId)
         {
@@ -52,12 +52,12 @@ namespace VotingApp.Infrastructure.Repositories
 
         public async Task<List<Poll>> GetAllPolls()
         {
-            return await _db.Polls.Include("Options").Include("Comments").ToListAsync();
+            return await _db.Polls.Include("Options").Include("Comments").Include("Votes").ToListAsync();
         }
 
         public async Task<Poll?> GetPollById(Guid pollId)
         {
-            return await _db.Polls.Include("Options").Include("Comments").FirstOrDefaultAsync(p => p.Id == pollId);
+            return await _db.Polls.Include("Options").Include("Comments").Include("Votes").FirstOrDefaultAsync(p => p.Id == pollId);
         }
     }
 }

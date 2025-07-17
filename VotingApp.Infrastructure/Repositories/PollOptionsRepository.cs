@@ -27,19 +27,19 @@ namespace VotingApp.Infrastructure.Repositories
             return await _db.SaveChangesAsync();
         }
 
-        public async Task<bool> AddVoter(Guid optionId, string userName)
-        {
-            PollOption? option = await _db.PollOptions.FirstOrDefaultAsync(o => o.Id == optionId);
-            if (option == null)
-            {
-                return false;
-            }
-            if (option.Voters == null)
-            {
-                option.Voters = new List<string>();
-            }
-            option.Voters.Add(userName);
-            return await _db.SaveChangesAsync() > 0;
-        }
+        //public async Task<bool> AddVoter(Guid optionId, string userName)
+        //{
+        //    PollOption? option = await _db.PollOptions.FirstOrDefaultAsync(o => o.Id == optionId);
+        //    if (option == null)
+        //    {
+        //        return false;
+        //    }
+        //    if (option.Voters == null)
+        //    {
+        //        option.Voters = new List<string>();
+        //    }
+        //    option.Voters.Add(userName);
+        //    return await _db.SaveChangesAsync() > 0;
+        //}
     }
 }

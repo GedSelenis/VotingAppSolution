@@ -23,6 +23,7 @@ builder.Services.AddScoped<ICommentService, CommentService>();
 builder.Services.AddScoped<IPollRepository, PollsRepository>();
 builder.Services.AddScoped<ICommentRepository, CommentRepository>();
 builder.Services.AddScoped<IPollOptionsRepository, PollOptionsRepository>();
+builder.Services.AddScoped<IVoteRepository, VoteRepository>();
 builder.Services.AddTransient<IEmailSender, EmailSender>();
 
 

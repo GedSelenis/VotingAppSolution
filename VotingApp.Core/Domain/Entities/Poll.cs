@@ -16,9 +16,10 @@ namespace VotingApp.Core.Domain.Entities
         public string CreatedBy { get; set; }
         public List<PollOption> Options { get; set; }
         public List<Comment>? Comments { get; set; }
-        public List<string>? Voters { get; set; }
+        //public List<string>? Voters { get; set; }
         public bool IsActive => PollEndTime > DateTime.UtcNow;
         public bool AuthenticatedOnly { get; set; }
+        public List<Vote>? Votes { get; set; }
 
     }
 }

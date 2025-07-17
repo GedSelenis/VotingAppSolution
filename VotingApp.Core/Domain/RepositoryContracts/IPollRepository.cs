@@ -11,7 +11,7 @@ namespace VotingApp.Core.Domain.RepositoryContracts
     public interface IPollRepository
     {
         Task<int> AddPoll(Poll request);
-        Task<bool> AddVote(Guid pollId, Guid optionID, string userName);
+        //Task<bool> AddVote(Guid pollId, Guid optionID, string userName);
         Task<List<Poll>> GetAllPolls();
         Task<Poll?> GetPollById(Guid pollId);
         Task<bool> DeletePoll(Guid pollId);

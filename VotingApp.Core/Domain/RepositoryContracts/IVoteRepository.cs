@@ -7,9 +7,9 @@ using VotingApp.Core.Domain.Entities;
 
 namespace VotingApp.Core.Domain.RepositoryContracts
 {
-    public interface IPollOptionsRepository
+    public interface IVoteRepository
     {
-        Task<int> AddPollOptions(List<PollOption> pollOptions);
-        //Task<bool> AddVoter(Guid optionId, string userName);
+        Task<bool> AddVoteAsync(Vote vote);
+        Task<bool> HasAlreadyVoted(Guid pollId, string userName);
     }
 }

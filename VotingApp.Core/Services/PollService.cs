@@ -15,13 +15,15 @@ namespace VotingApp.Core.Services
     public class PollService : IPollService
     {
         private readonly IPollRepository _pollRepository;
+        private readonly IVoteRepository _voteRepository;
         private readonly IPollOptionsRepository _optionsRepository;
 
 
-        public PollService(IPollRepository pollRepository, IPollOptionsRepository pollOptionsRepository)
+        public PollService(IPollRepository pollRepository, IPollOptionsRepository pollOptionsRepository, IVoteRepository voteRepository)
         {
             _pollRepository = pollRepository;
             _optionsRepository = pollOptionsRepository;
+            _voteRepository = voteRepository;
         }
         public async Task<PollResponse> AddPoll(PollAddRequest request)
         {
@@ -78,25 +80,47 @@ namespace VotingApp.Core.Services
             {
                 throw new InvalidOperationException("Cannot vote on a poll that has ended.");
             }
-            if (poll.AuthenticatedOnly && string.IsNullOrWhiteSpace(pollAddVoteRequest.UserName))
+            if (poll.AuthenticatedOnly && (pollAddVoteRequest.UserId == null || pollAddVoteRequest.UserId == Guid.Empty))
             {
                 throw new ArgumentException("Voter must be specified for authenticated polls.");
             }
-            else if (string.IsNullOrEmpty(pollAddVoteRequest.UserName))
+            else if (pollAddVoteRequest.UserId == null || pollAddVoteRequest.UserId == Guid.Empty)
             {
                 // Vote is anonymous, no user validation needed
 
-                //isValid = isValid && await _optionsRepository.AddVoter(pollAddVoteRequest.OptionId, pollAddVoteRequest.UserName ?? "");
-                isValid = await _pollRepository.AddVote(pollAddVoteRequest.PollId, pollAddVoteRequest.OptionId, pollAddVoteRequest.UserName ?? "");
-            }
-            else
-            {
-                if (poll.Voters != null && poll.Voters.Contains(pollAddVoteRequest.UserName ?? ""))
+                if (await _voteRepository.HasAlreadyVoted(pollAddVoteRequest.PollId, pollAddVoteRequest.UserName))
                 {
                     throw new InvalidOperationException("User has already voted in this poll.");
                 }
+
                 //isValid = isValid && await _optionsRepository.AddVoter(pollAddVoteRequest.OptionId, pollAddVoteRequest.UserName ?? "");
-                isValid = await _pollRepository.AddVote(pollAddVoteRequest.PollId, pollAddVoteRequest.OptionId, pollAddVoteRequest.UserName ?? "");
+                Vote vote = new Vote
+                {
+                    Id = Guid.NewGuid(),
+                    PollId = pollAddVoteRequest.PollId,
+                    PollOptionId = pollAddVoteRequest.OptionId,
+                    UserName = pollAddVoteRequest.UserName ?? "",
+                    UserId = Guid.Empty // Assuming anonymous votes do not have a UserId
+                };
+                isValid = await _voteRepository.AddVoteAsync(vote);
+            }
+            else
+            {
+                if (await _voteRepository.HasAlreadyVoted(pollAddVoteRequest.PollId, pollAddVoteRequest.UserName))
+                {
+                    throw new InvalidOperationException("User has already voted in this poll.");
+                }
+
+                //isValid = isValid && await _optionsRepository.AddVoter(pollAddVoteRequest.OptionId, pollAddVoteRequest.UserName ?? "");
+                Vote vote = new Vote
+                {
+                    Id = Guid.NewGuid(),
+                    PollId = pollAddVoteRequest.PollId,
+                    PollOptionId = pollAddVoteRequest.OptionId,
+                    UserName = pollAddVoteRequest.UserName ?? "",
+                    UserId = pollAddVoteRequest.UserId.Value // Assuming anonymous votes do not have a UserId
+                };
+                isValid = await _voteRepository.AddVoteAsync(vote);
             }
             if (isValid) {
                 Poll? updatedPoll = await _pollRepository.GetPollById(pollAddVoteRequest.PollId);

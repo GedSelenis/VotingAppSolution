@@ -8,15 +8,17 @@ using System.Threading.Tasks;
 
 namespace VotingApp.Core.Domain.Entities
 {
-    public class PollOption
+    public class Vote
     {
         [Key]
         public Guid Id { get; set; }
-        public string OptionText { get; set; }
-        //public List<string>? Voters { get; set; }
-        public Guid PollId { get; set; }
+        public Guid? PollId { get; set; }
         [ForeignKey("PollId")]
         public Poll? Poll { get; set; }
-        public List<Vote>? Votes { get; set; }
+        public Guid PollOptionId { get; set; }
+        [ForeignKey("PollOptionId")]
+        public PollOption? PollOption { get; set; }
+        public Guid UserId { get; set; }
+        public string UserName { get; set; }
     }
 }

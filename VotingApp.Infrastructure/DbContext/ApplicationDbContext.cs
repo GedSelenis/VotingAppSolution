@@ -9,6 +9,7 @@ namespace VotingApp.Infrastructure.DbContext
         public virtual DbSet<Poll> Polls { get; set; }
         public virtual DbSet<PollOption> PollOptions { get; set; }
         public virtual DbSet<Comment> Comments { get; set; }
+        public virtual DbSet<Vote> Votes { get; set; }
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)
         {

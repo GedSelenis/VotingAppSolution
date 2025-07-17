@@ -45,14 +45,14 @@
 					{
 						<div>
 						<label for="@option">@option.OptionText</label>
-							@if (option.Voters == null)
+							@if (option.Votes == null)
 							{
 								
 								<label for="@option">0</label>
 							}
 							else
 							{
-							<label for="@option">@option.Voters?.Count()</label>
+								<label for="@option">@option.Votes?.Count()</label>
 							}
 							<a asp-controller="Home" asp-action="AddVote" asp-route-pollId="@Model.Id" asp-route-optionId="@option.Id" class="link-hover">Vote</a>
 						</div>
