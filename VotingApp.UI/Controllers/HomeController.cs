@@ -239,14 +239,15 @@ namespace VotingApp.UI.Controllers
                 return BadRequest("Poll ID and email cannot be empty.");
             }
             PollResponse poll = await _pollService.GetPoll(pollAnonymousVoteRequest.PollId);
-            string body = "Here is vote options for you:\n\n\n";
-            foreach (var option in poll.Options)
-            {
-                body += $"{option.OptionText}\n";
-                body += "Vote link: " + Url.Action("AddVoteAnonymous", "Home", new { pollID = pollAnonymousVoteRequest.PollId, optionID = option.Id, email = pollAnonymousVoteRequest.UserEmail}, Request.Scheme) + "\n\n";
-            }
+            //string body = "Here is vote options for you:\n\n\n";
+            //foreach (var option in poll.Options)
+            //{
+            //    body += $"{option.OptionText}\n";
+            //    body += "Vote link: " + Url.Action("AddVoteAnonymous", "Home", new { pollID = pollAnonymousVoteRequest.PollId, optionID = option.Id, email = pollAnonymousVoteRequest.UserEmail}, Request.Scheme) + "\n\n";
+            //}
 
-            await _emailSender.SendEmailAsync(pollAnonymousVoteRequest.UserEmail, "Voting options", body);
+            await _emailSender.SendVotingOptions(pollAnonymousVoteRequest.UserEmail, "Voting options", poll.Options, pollAnonymousVoteRequest);
+            //await _emailSender.SendEmailAsync(pollAnonymousVoteRequest.UserEmail, "Voting options", body);
 
             return RedirectToAction("PollDetails", new { pollId = pollAnonymousVoteRequest.PollId });
         }

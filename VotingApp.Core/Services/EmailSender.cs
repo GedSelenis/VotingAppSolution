@@ -6,6 +6,8 @@ using System.Net;
 using System.Net.Mail;
 using System.Text;
 using System.Threading.Tasks;
+using VotingApp.Core.Domain.Entities;
+using VotingApp.Core.DTO;
 using VotingApp.Core.ServiceContracts;
 
 namespace VotingApp.Core.Services
@@ -32,6 +34,18 @@ namespace VotingApp.Core.Services
 
             await smtpClient.SendMailAsync(
                 new MailMessage(from: mail, to: email,subject,message));
+        }
+
+        public async Task SendVotingOptions(string email, string subject, List<PollOption> pollOptions, PollAnonymousVoteRequest pollAnonymousVoteRequest)
+        {
+            string body = "Here is vote options for you:\n\n\n";
+            foreach (var option in pollOptions)
+            {
+                body += $"{option.OptionText}\n";
+                body += $"Vote link: http://localhost:5195/AddVoteAnonymous/{pollAnonymousVoteRequest.PollId}/{option.Id}/{pollAnonymousVoteRequest.UserEmail}" + "\n\n";
+            }
+
+            await SendEmailAsync(email, subject, body);
         }
     }
 }
